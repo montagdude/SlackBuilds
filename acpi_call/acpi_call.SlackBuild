@@ -43,7 +43,7 @@ fi
 PKG_ARCH=$ARCH
 
 CWD=$(pwd)
-TMP=${TMP:-/tmp/SBo}
+TMP=${TMP:-/tmp/mntg}
 PKG=${PKG:-$TMP/package-$PRGNAM}
 OUTPUT=${OUTPUT:-/tmp}
 
