@@ -1,0 +1,45 @@
+#!/bin/sh
+
+function load_acpi_call ()
+{
+  echo -n "Starting acpi_call kernel module"
+  if ! modprobe acpi_call > /dev/null 2>&1; then
+    echo "...failed!"
+    echo "modprobe acpi_call failed. Please use 'dmesg' to find out why."
+    exit 1
+  else
+    echo "...done."
+  fi
+  sleep .2
+}
+
+function unload_acpi_call ()
+{
+  echo -n "Stopping acpi_call kernel module"
+  if ! modprobe -r acpi_call > /dev/null 2>&1; then
+    echo "...failed!"
+    echo "Cannot unload module acpi_call."
+    exit 2
+  else
+    echo "...done."
+  fi
+}
+
+case "$1" in
+    start)
+        load_acpi_call
+        ;;
+    stop)
+        unload_acpi_call
+        ;;
+    restart)
+        unload_acpi_call
+        load_acpi_call
+        ;;
+    *)
+      echo "Usage: $0 start|stop|restart"
+      exit 3
+      ;;
+esac
+
+exit 0

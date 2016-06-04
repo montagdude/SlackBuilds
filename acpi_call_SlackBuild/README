@@ -1,0 +1,12 @@
+From https://github.com/mkottman/acpi_call:
+
+"A simple kernel module that enables you to call ACPI methods by writing the
+method name followed by arguments to /proc/acpi/call."
+
+It is used, for example, by TLP to set custom battery charging thresholds
+for some newer Thinkpad models. This module is considered to be a
+proof-of-concept and should be used with caution.
+
+To build the package for a kernel different from the running one, start the
+script setting the KERNEL variable as in
+        KERNEL=4.4.10 ./acpi_call.SlackBuild

@@ -1,0 +1,19 @@
+You'll need to add the following lines to /etc/rc.d/rc.local:
+
+	# Start acpi_call
+	if [ -x /etc/rc.d/rc.acpi_call ]; then
+	  /etc/rc.d/rc.acpi_call start
+	fi
+
+This will load the support kernel module for VirtualBox.
+
+
+You'll then need to add the following lines to /etc/rc.d/rc.local_shutdown:
+
+	# Stop acpi_call
+	if [ -x /etc/rc.d/rc.acpi_call ]; then
+	  /etc/rc.d/rc.acpi_call stop
+	fi
+
+Make sure that rc.acpi_call is executable. If you are using this as an optional
+dependency of TLP, you should put the lines in rc.local before TLP is started.
