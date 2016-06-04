@@ -25,7 +25,7 @@
 PRGNAM=acpi_call
 VERSION=${VERSION:-1.1.0}
 BUILD=${BUILD:-1}
-TAG=${TAG:-_SBo}
+TAG=${TAG:-_mntg}
 
 KERNEL=${KERNEL:-$(uname -r)}
 PKG_VERS=${VERSION}_$(echo $KERNEL | tr - _)
