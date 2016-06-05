@@ -1,0 +1,6 @@
+ksuperkey is a Linux utility to make Super key send Alt+F1 key events
+when pressed on its own to launch the application launcher in KDE
+Plasma desktop. It is also possible to send other key events. For more
+information, see the README.md file at the homepage:
+
+https://github.com/hanschen/ksuperkey
