@@ -56,7 +56,7 @@ find -L . \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
 mkdir -p $PKG/usr/sbin
-install -m 0744 sbomgr $PKG/usr/sbin
+install -m 0755 sbomgr $PKG/usr/sbin
 
 mkdir -p $PKG/etc/sbomgr
 install -m 0644 sbomgr.conf $PKG/etc/sbomgr
