@@ -9,8 +9,11 @@
 sbomgr: sbomgr (tool to manage packages from SlackBuilds.org)
 sbomgr:
 sbomgr: sbomgr is a tool to automate installation of packages from
-sbomgr: SlackBuilds.org (SBo). It works by cloning the git repository and
-sbomgr: running the SlackBuild scripts along with installpkg and removepkg.
+sbomgr: SlackBuilds.org (SBo) and similar SlackBuilds repositories. It works 
+sbomgr: by cloning the git repository and running the SlackBuild scripts along 
+sbomgr: with installpkg and removepkg.
 sbomgr: 
 sbomgr: Homepage: https://github.com/montagdude/sbomgr
+sbomgr:
+sbomgr:
 sbomgr:
