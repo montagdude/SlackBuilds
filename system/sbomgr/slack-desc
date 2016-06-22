@@ -14,4 +14,3 @@ sbomgr: running the SlackBuild scripts along with installpkg and removepkg.
 sbomgr: 
 sbomgr: Homepage: https://github.com/montagdude/sbomgr
 sbomgr:
-sbomgr: 
