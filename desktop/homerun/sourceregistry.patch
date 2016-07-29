@@ -1,5 +1,5 @@
---- sourceregistry.cpp	2014-06-30 11:12:43.000000000 -0400
-+++ sourceregistry_new.cpp	2016-07-29 15:30:51.106928833 -0400
+--- components/sourceregistry.cpp	2014-06-30 11:12:43.000000000 -0400
++++ components/sourceregistry_new.cpp	2016-07-29 15:30:51.106928833 -0400
 @@ -268,7 +268,6 @@
      d->m_availableSourcesModel = new AvailableSourcesModel(d->m_sourceInfos, this);
  
