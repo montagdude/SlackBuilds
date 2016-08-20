@@ -32,7 +32,7 @@ PRGNAM=lumina
 SRCVERSION=${SRCVERSION:-1.0.0-Release-p2}
 VERSION="$(echo $SRCVERSION | cut -d'-' -f1)_Release_p2"
 BUILD=${BUILD:-1}
-TAG=${TAG:-_SBo}
+TAG=${TAG:-_mntg}
 
 if [ -z "$ARCH" ]; then
   case "$( uname -m )" in
@@ -43,7 +43,7 @@ if [ -z "$ARCH" ]; then
 fi
 
 CWD=$(pwd)
-TMP=${TMP:-/tmp/SBo}
+TMP=${TMP:-/tmp/mntg}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
