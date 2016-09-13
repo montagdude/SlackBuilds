@@ -70,17 +70,17 @@ find -L . \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
 cd plotlib
-  cp $CWD/config.make.plotlib config.make
+  cp $CWD/Makefiles/config.make.plotlib config.make
   make
 cd -
 
 cd eispack
-  cp $CWD/Makefile.eispack Makefile
+  cp $CWD/Makefiles/Makefile.eispack Makefile
   make
 cd -
 
 cd bin
-  cp $CWD/Makefile.avl Makefile
+  cp $CWD/Makefiles/Makefile.avl Makefile
   make
   make install DESTDIR="$PKG"
 cd -
