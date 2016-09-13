@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Slackware build script for avl
+# Slackware build script for xfoil
 
 # Copyright 2016 Daniel Prosser, Lexington Park, MD
 # All rights reserved.
@@ -22,8 +22,8 @@
 #  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-PRGNAM=avl
-VERSION=${VERSION:-3.35}
+PRGNAM=xfoil
+VERSION=${VERSION:-6.99}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_mntg}
 
@@ -59,9 +59,9 @@ set -e
 rm -rf $PKG
 mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
-rm -rf Avl
+rm -rf Xfoil
 tar xvf $CWD/$PRGNAM$VERSION.tgz
-cd Avl
+cd Xfoil
 chown -R root:root .
 find -L . \
  \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 \
@@ -69,39 +69,43 @@ find -L . \
  \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
+# Add BACKSPACE command to avoid write errors with new gfortran
+sed -i '660 a \      BACKSPACE(LU)' src/iopol.f
+
+cd orrs
+  # Correct path to osmapDP.dat
+  sed -i '101s/\/home\/codes\/orrs\/osmapDP.dat/\/tmp\/mntg\/Xfoil\/orrs\/osmapDP.dat/' src/osmap.f
+  cd bin
+  cp $CWD/Makefile.orrs Makefile
+  make osgen
+  make osmap.o
+  cd ..
+cd ..
+
 cd plotlib
   cp $CWD/config.make.plotlib config.make
-  make
-cd -
-
-cd eispack
-  cp $CWD/Makefile.eispack Makefile
-  make
+  make libPlt_gDP.a
 cd -
 
 cd bin
-  cp $CWD/Makefile.avl Makefile
-  make
+  cp $CWD/Makefile.xfoil Makefile
+  make xfoil
+  make pplot
+  make pxplot
   make install DESTDIR="$PKG"
 cd -
-
-# Remove this silly-named file that causes problems for the package manager
-rm runs/?[A
 
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
 cp -a \
-  README avl_doc.txt session1.txt session2.txt version_notes.txt \
+  README xfoil_doc.txt sessions.txt version_notes.txt \
   $PKG/usr/doc/$PRGNAM-$VERSION
 cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
 
 mkdir -p $PKG/install
 cat $CWD/slack-desc > $PKG/install/slack-desc
-
-mkdir -p $PKG/usr/share/$PRGNAM
-cp -a runs $PKG/usr/share/$PRGNAM
 
 cd $PKG
 /sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.${PKGTYPE:-tgz}
