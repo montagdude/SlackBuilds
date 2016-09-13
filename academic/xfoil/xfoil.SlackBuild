@@ -76,19 +76,19 @@ cd orrs
   # Correct path to osmapDP.dat
   sed -i '101s/\/home\/codes\/orrs\/osmapDP.dat/\/tmp\/mntg\/Xfoil\/orrs\/osmapDP.dat/' src/osmap.f
   cd bin
-  cp $CWD/Makefile.orrs Makefile
+  cp $CWD/Makefiles/Makefile.orrs Makefile
   make osgen
   make osmap.o
   cd ..
 cd ..
 
 cd plotlib
-  cp $CWD/config.make.plotlib config.make
+  cp $CWD/Makefiles/config.make.plotlib config.make
   make libPlt_gDP.a
 cd -
 
 cd bin
-  cp $CWD/Makefile.xfoil Makefile
+  cp $CWD/Makefiles/Makefile.xfoil Makefile
   make xfoil
   make pplot
   make pxplot
