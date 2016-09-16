@@ -72,6 +72,9 @@ find -L . \
 # Add BACKSPACE command to avoid write errors with new gfortran
 sed -i '660 a \      BACKSPACE(LU)' src/iopol.f
 
+# Get rid of hard-coded debugging output in xoper.f
+patch -p0 < $CWD/xoper.f.patch
+
 cd orrs
   # Correct path to osmapDP.dat
   sed -i '101s/\/home\/codes\/orrs\/osmapDP.dat/\/tmp\/mntg\/Xfoil\/orrs\/osmapDP.dat/' src/osmap.f
