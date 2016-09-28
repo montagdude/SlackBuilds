@@ -22,7 +22,8 @@ EIGOBJ = ../eispack/eispack_gDP.a
 
 FC = gfortran
 
-ACHK = -fbounds-check -finit-real=inf -ffpe-trap=invalid,zero,denormal
+#ACHK = -fbounds-check -finit-real=inf -ffpe-trap=invalid,zero,denormal
+ACHK = 
 PLTLIB=-lX11
 FTNLIB=
 
