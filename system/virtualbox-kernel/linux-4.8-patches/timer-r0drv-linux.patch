@@ -1,0 +1,12 @@
+--- vboxdrv/r0drv/linux/timer-r0drv-linux.c.orig	2016-12-15 22:10:36.847283430 -0500
++++ vboxdrv/r0drv/linux/timer-r0drv-linux.c	2016-12-15 22:10:59.499282343 -0500
+@@ -55,6 +55,9 @@
+ # define HRTIMER_MODE_ABS_PINNED        HRTIMER_MODE_ABS
+ #endif
+ 
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 8, 0)
++# define mod_timer_pinned               mod_timer
++#endif
+ 
+ /*********************************************************************************************************************************
+ *   Structures and Typedefs                                                                                                      *

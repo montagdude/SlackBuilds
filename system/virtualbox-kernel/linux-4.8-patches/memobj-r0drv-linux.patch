@@ -1,0 +1,43 @@
+--- vboxdrv/r0drv/linux/memobj-r0drv-linux.c.orig	2016-12-15 12:35:57.529204806 -0500
++++ vboxdrv/r0drv/linux/memobj-r0drv-linux.c	2016-12-15 12:40:49.109200079 -0500
+@@ -578,7 +578,7 @@
+                 {
+                     if (!PageReserved(pMemLnx->apPages[iPage]))
+                         SetPageDirty(pMemLnx->apPages[iPage]);
+-                    page_cache_release(pMemLnx->apPages[iPage]);
++                    delete_from_page_cache(pMemLnx->apPages[iPage]);
+                 }
+ 
+                 if (pTask && pTask->mm)
+@@ -1029,14 +1029,14 @@
+         /*
+          * Get user pages.
+          */
+-        rc = get_user_pages(pTask,                  /* Task for fault accounting. */
+-                            pTask->mm,              /* Whose pages. */
+-                            R3Ptr,                  /* Where from. */
+-                            cPages,                 /* How many pages. */
+-                            fWrite,                 /* Write to memory. */
+-                            fWrite,                 /* force write access. */
+-                            &pMemLnx->apPages[0],   /* Page array. */
+-                            papVMAs);               /* vmas */
++        rc = get_user_pages_remote(pTask,                  /* Task for fault accounting. */
++                                   pTask->mm,              /* Whose pages. */
++                                   R3Ptr,                  /* Where from. */
++                                   cPages,                 /* How many pages. */
++                                   fWrite,                 /* Write to memory. */
++                                   fWrite,                 /* force write access. */
++                                   &pMemLnx->apPages[0],   /* Page array. */
++                                   papVMAs);               /* vmas */
+         if (rc == cPages)
+         {
+             /*
+@@ -1081,7 +1081,7 @@
+         {
+             if (!PageReserved(pMemLnx->apPages[rc]))
+                 SetPageDirty(pMemLnx->apPages[rc]);
+-            page_cache_release(pMemLnx->apPages[rc]);
++            delete_from_page_cache(pMemLnx->apPages[rc]);
+         }
+ 
+         up_read(&pTask->mm->mmap_sem);
