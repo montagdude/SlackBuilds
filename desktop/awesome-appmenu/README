@@ -5,6 +5,4 @@ configuration script. It supports icons, and the paths to search for launchers
 and icons, as well as the categories used for grouping applications, are
 fully configurable.
 
-This requires: awesome
-
 Homepage: https://github.com/montagdude/awesome-appmenu
