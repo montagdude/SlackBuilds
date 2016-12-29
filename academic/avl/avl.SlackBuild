@@ -69,23 +69,22 @@ find -L . \
  \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
+patch -p0 < $CWD/Makefile_patches/config.make.plotlib.patch
+patch -p0 < $CWD/Makefile_patches/Makefile.eispack.patch
+patch -p0 < $CWD/Makefile_patches/Makefile.avl.patch
+
 cd plotlib
-  cp $CWD/Makefiles/config.make.plotlib config.make
   make
 cd -
-
 cd eispack
-  cp $CWD/Makefiles/Makefile.eispack Makefile
   make
 cd -
-
 cd bin
-  cp $CWD/Makefiles/Makefile.avl Makefile
   make
   make install DESTDIR="$PKG"
 cd -
 
-# Remove this silly-named file that causes problems for the package manager
+# This file seems to be useless, and it's weird name causes problems for removepkg
 rm runs/?[A
 
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
