@@ -1,12 +1,44 @@
---- vboxdrv/r0drv/linux/timer-r0drv-linux.c.orig	2016-12-15 22:10:36.847283430 -0500
-+++ vboxdrv/r0drv/linux/timer-r0drv-linux.c	2016-12-15 22:10:59.499282343 -0500
-@@ -55,6 +55,9 @@
- # define HRTIMER_MODE_ABS_PINNED        HRTIMER_MODE_ABS
+--- vboxdrv/r0drv/linux/timer-r0drv-linux.c.orig	2016-12-29 10:17:28.859909486 -0500
++++ vboxdrv/r0drv/linux/timer-r0drv-linux.c	2016-12-29 10:23:15.245892861 -0500
+@@ -361,7 +361,13 @@
+         pSubTimer->u.Std.fFirstAfterChg = true;
+ #ifdef CONFIG_SMP
+         if (fPinned)
++        {
++# if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 8, 0)
++            mod_timer(&pSubTimer->u.Std.LnxTimer, pSubTimer->u.Std.ulNextJiffies);
++# else
+             mod_timer_pinned(&pSubTimer->u.Std.LnxTimer, pSubTimer->u.Std.ulNextJiffies);
++# endif
++        }
+         else
  #endif
+             mod_timer(&pSubTimer->u.Std.LnxTimer, pSubTimer->u.Std.ulNextJiffies);
+@@ -796,7 +802,13 @@
+         {
+ #ifdef CONFIG_SMP
+             if (pTimer->fSpecificCpu || pTimer->fAllCpus)
++            {
++# if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 8, 0)
++                mod_timer(&pSubTimer->u.Std.LnxTimer, pSubTimer->u.Std.ulNextJiffies);
++# else
+                 mod_timer_pinned(&pSubTimer->u.Std.LnxTimer, pSubTimer->u.Std.ulNextJiffies);
++# endif
++            }
+             else
+ #endif
+                 mod_timer(&pSubTimer->u.Std.LnxTimer, pSubTimer->u.Std.ulNextJiffies);
+@@ -853,7 +865,13 @@
  
-+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 8, 0)
-+# define mod_timer_pinned               mod_timer
-+#endif
- 
- /*********************************************************************************************************************************
- *   Structures and Typedefs                                                                                                      *
+ #ifdef CONFIG_SMP
+                     if (pTimer->fSpecificCpu || pTimer->fAllCpus)
++                    {
++# if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 8, 0)
++                        mod_timer(&pSubTimer->u.Std.LnxTimer, pSubTimer->u.Std.ulNextJiffies);
++# else
+                         mod_timer_pinned(&pSubTimer->u.Std.LnxTimer, pSubTimer->u.Std.ulNextJiffies);
++# endif
++                    }
+                     else
+ #endif
+                         mod_timer(&pSubTimer->u.Std.LnxTimer, pSubTimer->u.Std.ulNextJiffies);
