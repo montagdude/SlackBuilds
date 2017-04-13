@@ -81,7 +81,7 @@ cd eispack
 cd -
 cd bin
   make -f Makefile.gfortran
-  make -f Makefile.gfortran install DESTDIR="$PKG"
+  make -f Makefile.gfortran install DESTDIR=$PKG
 cd -
 
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
