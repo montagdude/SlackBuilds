@@ -59,7 +59,7 @@ mkdir -p $PKG/usr/sbin
 install -m 0755 sbomgr $PKG/usr/sbin
 
 mkdir -p $PKG/etc/sbomgr
-install -m 0644 sbomgr.conf $PKG/etc/sbomgr
+install -m 0644 sbomgr.conf $PKG/etc/sbomgr/sbomgr.conf.new
 
 mkdir -p $PKG/install
 cat $CWD/slack-desc > $PKG/install/slack-desc
