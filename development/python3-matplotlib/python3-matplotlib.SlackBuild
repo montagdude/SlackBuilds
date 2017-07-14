@@ -100,7 +100,8 @@ sed -i "/= BuildExtraLibraries/d" setup.py
 # Use modified setupext.py to make sure that the build process gets
 # interrupted if requirements are not fulfilled
 #
-cat "${CWD}/setupext.py" > setupext.py
+# DP mod: don't do this, because setupext.py needs to be updated for v2.0.2
+#cat "${CWD}/setupext.py" > setupext.py
 
 python3 setup.py install --root $PKG  # > ${CWD}/SETUP.OUTPUT 2>&1
 
