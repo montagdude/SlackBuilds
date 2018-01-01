@@ -23,8 +23,8 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PRGNAM=sboui
-VERSION=${VERSION:-0.4.2}
-BUILD=${BUILD:-1}
+VERSION=${VERSION:-1.0_dev}
+BUILD=${BUILD:-6}
 TAG=${TAG:-_mntg}
 
 if [ -z "$ARCH" ]; then
@@ -87,6 +87,7 @@ find $PKG/usr/man -type f -exec gzip -9 {} \;
 for i in $( find $PKG/usr/man -type l ) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
 
 mv $PKG/etc/sboui/sboui.conf $PKG/etc/sboui/sboui.conf.new
+mv $PKG/etc/sboui/sboui-backend.conf $PKG/etc/sboui/sboui-backend.conf.new
 mv $PKG/etc/sboui/package_blacklist $PKG/etc/sboui/package_blacklist.new
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
