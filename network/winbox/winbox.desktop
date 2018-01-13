@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Winbox
+GenericName=RouterOS Configuration Tool
+Comment=RouterOS Configuration Tool
+Exec=wine /usr/bin/winbox.exe
+Type=Application
+Terminal=true
+StartupNotify=true
+StartupWMClass=winbox.exe
+Icon=winbox
+Categories=Wine;Settings;Network;
