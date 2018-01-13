@@ -1,0 +1,6 @@
+!/bin/bash
+#
+# Launches Winbox with wine
+#
+
+wine /usr/bin/winbox.exe

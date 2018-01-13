@@ -2,7 +2,7 @@
 Name=Winbox
 GenericName=RouterOS Configuration Tool
 Comment=RouterOS Configuration Tool
-Exec=wine /usr/bin/winbox.exe
+Exec=winbox
 Type=Application
 StartupNotify=true
 StartupWMClass=winbox.exe
