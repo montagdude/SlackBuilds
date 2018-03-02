@@ -24,7 +24,7 @@
 
 PRGNAM=xflr5
 VERSION=${VERSION:-6.40}
-BUILD=${BUILD:-2}
+BUILD=${BUILD:-4}
 TAG=${TAG:-_mntg}
 
 if [ -z "$ARCH" ]; then
@@ -82,11 +82,19 @@ qmake-qt5 \
 make
 make install INSTALL_ROOT=$PKG
 
-# Rename libdir, since there's no configuration option to do so
-mv $PKG/usr/lib $PKG/usr/lib${LIBDIRSUFFIX}
+# Rename lib directory manually, since there's no configuration option to do so
+if [ -n "$LIBDIRSUFFIX" ]; then
+  mv $PKG/usr/lib $PKG/usr/lib${LIBDIRSUFFIX}
+fi
 
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
+
+mkdir -p $PKG/usr/share/icons/hicolor/64x64/apps
+cp -a xflr5-gui/images/xflr5_64.png $PKG/usr/share/icons/hicolor/64x64/apps
+
+mkdir -p $PKG/usr/share/applications
+cp -a $CWD/xflr5.desktop $PKG/usr/share/applications
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
 cp -a License.txt $PKG/usr/doc/$PRGNAM-$VERSION
