@@ -3,6 +3,7 @@
 # Copyright 2001, 2002, 2003  Slackware Linux, Inc., Concord, California, USA
 # Copyright 2009, 2015  Patrick J. Volkerding, Sebeka, MN, USA
 # Copyright 2015  Michal Nazarewicz <mina86@mina86.com>
+# Copyright 2018  Daniel Prosser, Lexington Park, MD, USA <dpross1100@msn.com>
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -21,6 +22,10 @@
 #  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 #  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Tue Aug 28 14:37:00 EDT 2018 Daniel Prosser
+# Do not run doinst.sh during the preinstall phase. This is needed to facilitate
+# the changes made in installpkg.
 #
 # Modified to handle either old 8.3 or new package-version-arch-build.tgz
 # packages, Sat Nov 17 14:25:58 PST 2001 volkerdi
@@ -302,11 +307,11 @@ EOF
 
   # Next, the new package is pre-installed:
   if [ "$VERBOSE" = "verbose" ]; then
-    /sbin/installpkg $INCOMINGDIR/$NNAME
+    /sbin/installpkg --preinstall $INCOMINGDIR/$NNAME
     RETCODE=$?
   else
     echo "Pre-installing package $NEW..."
-    /sbin/installpkg $INCOMINGDIR/$NNAME 1> /dev/null
+    /sbin/installpkg --preinstall $INCOMINGDIR/$NNAME 1> /dev/null
     RETCODE=$?
   fi
   # Make sure that worked:

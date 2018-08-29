@@ -2,6 +2,7 @@
 # Copyright 1994, 1998, 2000  Patrick Volkerding, Concord, CA, USA 
 # Copyright 2001, 2003  Slackware Linux, Inc., Concord, CA, USA
 # Copyright 2007, 2009, 2011  Patrick Volkerding, Sebeka, MN, USA 
+# Copyright 2018  Daniel Prosser, Lexington Park, MD, USA <dpross1100@msn.com>
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -20,6 +21,12 @@
 #  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 #  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Tue Aug 28 14:37:00 EDT 2018 Daniel Prosser
+# Replace config() function in doinst.sh to only write a .new file if the
+# config file has changed relative to an unmodified reference version. This
+# prevents a .new file from being written if the only changes are the ones the
+# system admin has made.
 #
 # Sun Sep  6 21:58:36 BST 2009
 # Replaced usage of "cat" with STDIN redirection or file name parameters
@@ -70,6 +77,67 @@ export LANG
 pkgbase() {
   # basename + strip extensions .tbz, .tgz, .tlz and .txz
   echo "$1" | sed 's?.*/??;s/\.t[bglx]z$//'
+}
+
+# Replace existing config() file in doinst.sh with one that compares with an
+# unmodified reference file when deciding whether to write a .new
+replace_config() {
+  local INCOMING="$1"
+  local TEMP=tmpconf
+
+  # Write a temporary install file with replaced config() function
+  rm -f $TEMP
+  local MODE="copy"
+
+  # https://stackoverflow.com/questions/4642191/read-line-by-line-in-bash-script
+  while IFS= read -r line; do
+    if [ "$MODE" == "copy" ]; then
+      if [ -n "$(echo "$line" | grep "config()")" ]; then
+        MODE="replace"
+
+        # Backslash prevents variable expansion in heredoc
+        cat << \EOF >> $TEMP
+config() {
+  NEW="$1"
+  OLD="$(dirname $NEW)/$(basename $NEW .new)"
+  REF="${OLD}.ref"
+  # If there's no config file by that name, mv it over:
+  if [ ! -r $OLD ]; then
+    cp $NEW $REF
+    mv $NEW $OLD
+  else
+    # If reference config file doesn't exist, fall back to the old behavior
+    if [ ! -r $REF ]; then
+      if [ "$(cat $OLD | md5sum)" = "$(cat $NEW | md5sum)" ]; then # toss the redundant copy
+        mv $NEW $REF
+      else
+        cp $NEW $REF
+      fi
+    else
+      if [ "$(cat $REF | md5sum)" = "$(cat $NEW | md5sum)" ]; then # toss the redundant copy
+        mv $NEW $REF
+      else
+        cp $NEW $REF
+      fi
+    fi
+  fi
+}
+EOF
+      else
+        printf '%s\n' "$line" >> $TEMP
+      fi
+    elif [ "$MODE" == "replace" ]; then
+
+      # https://stackoverflow.com/questions/369758/how-to-trim-whitespace-from-a-bash-variable
+      remove_leading_whitespace="$(echo -e "${line}" | sed -e 's/^[[:space:]]*//')"
+      if [ "${remove_leading_whitespace:0:1}" == "}" ]; then
+        MODE="copy"
+      fi
+    fi
+  done < "$INCOMING"
+
+  # Overwrite original file
+  mv $TEMP $INCOMING
 }
 
 # If installpkg encounters a problem, it will return a non-zero error code.
@@ -145,6 +213,7 @@ package_name() {
 
 # Parse options:
 MODE=install # standard text-mode
+PREINSTALL=0
 while [ 0 ]; do
   if [ "$1" = "-warn" -o "$1" = "--warn" ]; then
     MODE=warn
@@ -188,6 +257,9 @@ while [ 0 ]; do
     fi
     ROOT="$2"
     shift 2
+  elif [ "$1" = "-preinstall" -o "$1" = "--preinstall" ]; then
+    PREINSTALL=1
+    shift 1
   else
     break
   fi
@@ -517,10 +589,12 @@ EOF
     /sbin/ldconfig
   fi
 
-  if [ -f $ROOT/install/doinst.sh ]; then
+  if [ -f $ROOT/install/doinst.sh -a $PREINSTALL -eq 0 ]; then
     if [ "$MODE" = "install" ]; then
       echo "Executing install script for $(basename $package)."
     fi
+    # Replace config() function in install script to consider .ref files
+    replace_config $ROOT/install/doinst.sh
     # If bash is available, use sed to convert the install script to use pushd/popd
     # rather than spawning subshells which is slow on ARM.  This will also speed up
     # install script processing on any platform.

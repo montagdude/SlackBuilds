@@ -29,7 +29,7 @@ PKG=$TMP/package-pkgtools
 # *** UPDATE THESE WITH EACH BUILD:
 VERSION=14.2
 ARCH=${ARCH:-noarch}
-BUILD=10
+BUILD=13
 
 if [ ! -d $TMP ]; then
   mkdir -p $TMP # location to build the source
