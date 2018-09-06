@@ -1,0 +1,4 @@
+slapt-get is a package manager for Slackware that tries to emulate Debian's
+apt-get as closely as possible.
+
+This requires gksu from SlackBuilds.org.

@@ -1,0 +1,6 @@
+salix-update-notifier is a daemon that provides system tray notifications if
+package updates are available from on-line package repositories. It uses
+slapt-get and gslapt to determine if there are any updates available and
+actually perform the package updates.
+
+This requires zenity from SlackBuilds.org.

@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+                     |-----handy-ruler------------------------------------------------------|
+salix-update-notifier: salix-update-notifier (daemon to notify of package updates)
+salix-update-notifier:
+salix-update-notifier: salix-update-notifier is a daemon that provides system tray 
+salix-update-notifier: notifications if package updates are available from on-line package
+salix-update-notifier: repositories. It uses slapt-get and gslapt to determine if there are
+salix-update-notifier: any updates available and actually perform the package updates.
+salix-update-notifier:
+salix-update-notifier: homepage: https://github.com/gapan/salix-update-notifier
+salix-update-notifier:
+salix-update-notifier:
+salix-update-notifier:
