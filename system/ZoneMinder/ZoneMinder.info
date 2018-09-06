@@ -1,0 +1,12 @@
+PRGNAM="ZoneMinder"
+VERSION="1.30.4"
+HOMEPAGE="https://www.zoneminder.com"
+DOWNLOAD="http://www.andywilcock.com/code/cambozola/cambozola-0.936.tar.gz \
+          https://downloads.sourceforge.net/jscalendar/jscalendar-1.0.zip"
+MD5SUM="c4896a99702af61eead945ed58b5667b \
+	10f2160fe68294013efcd1473cd36f72"
+DOWNLOAD_x86_64=""
+MD5SUM_x86_64=""
+REQUIRES="perl-Module-Build perl-Date-Manip perl-Sys-Mmap libwww-perl perl-Sys-CPU perl-Sys-MemInfo"
+MAINTAINER="Geno Bob"
+EMAIL="geno.bob@gmail.com"
