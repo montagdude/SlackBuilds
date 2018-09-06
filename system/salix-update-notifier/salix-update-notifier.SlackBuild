@@ -24,7 +24,7 @@
 
 PRGNAM=salix-update-notifier
 VERSION=${VERSION:-0.7.0}
-BUILD=${BUILD:-2}
+BUILD=${BUILD:-3}
 TAG=${TAG:-_mntg}
 
 if [ -z "$ARCH" ]; then
