@@ -23,8 +23,8 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PRGNAM=sboui
-VERSION=${VERSION:-1.1}
-BUILD=${BUILD:-4}
+VERSION=${VERSION:-1.2dev}
+BUILD=${BUILD:-6}
 TAG=${TAG:-_mntg}
 
 if [ -z "$ARCH" ]; then
@@ -39,6 +39,19 @@ CWD=$(pwd)
 TMP=${TMP:-/tmp/mntg}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
+
+# Option to build with ninja instead of make; must have ninja installed
+USE_NINJA="${USE_NINJA:-no}"
+if [ "$USE_NINJA" == "yes" ]; then
+  GENERATOR="Ninja"
+  BUILDCMD="ninja"
+else
+  GENERATOR="Unix Makefiles"
+  BUILDCMD="make"
+fi
+
+# C++ compiler; g++ is default, but can also use clang++ (or other?)
+CXX_COMPILER="${CXX_COMPILER:-g++}"
 
 if [ "$ARCH" = "i586" ]; then
   SLKCFLAGS="-O2 -march=i586 -mtune=i686"
@@ -72,12 +85,14 @@ find -L . \
 mkdir -p build
 cd build
   cmake \
+    -G "$GENERATOR" \
     -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
+    -DCMAKE_CXX_COMPILER:STRING="$CXX_COMPILER" \
     -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DCMAKE_BUILD_TYPE=Release ..
-  make
-  make install DESTDIR=$PKG
+  $BUILDCMD
+  DESTDIR=$PKG $BUILDCMD install
 cd ..
 
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \

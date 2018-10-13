@@ -1,9 +1,13 @@
 sboui is an ncurses-based user interface for sbopkg, sbotools, and similar tools
-to manage packages built from SlackBuilds.org scripts. Unlike other Slackware
-system administration tools with dialog-based user interfaces, sboui is written
-in C++ utilizing low-level ncurses library calls. It features a two-pane listing
-of software groups and names, multiple filters, searching, forward and inverse
-dependency resolution, tagging multiple packages to apply batch changes,
-configurable colors, and more. In addition to supporting the well-known SBo
-package managers, it also includes a built-in package manager, and it is easy to
-make it work with custom tools.
+to manage packages built from SlackBuilds.org scripts. It also includes a built-
+in package manager if you wish to use it standalone. It has been built from the
+ground up using ncurses and C++ to give a very efficient and user-friendly
+interface. It features forward and reverse dependency resolution, filters,
+searching, tagging, browsing and modifying files in the SBo repo, and storing
+build options for packages. Both keyboard and mouse (in development) interaction
+are fully supported.
+
+The SlackBuild script supports the following build options:
+* USE_NINJA=yes (default no): build with Ninja instead of GNU Make. If yes,
+  ninja is required.
+* CXX_COMPILER=clang++ or other (default g++): switch C++ compiler.
