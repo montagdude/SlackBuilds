@@ -1,0 +1,29 @@
+--- src/salix-update-notifier	2016-08-07 18:28:06.000000000 -0400
++++ src/salix-update-notifier.new	2018-11-29 23:25:38.757736216 -0500
+@@ -25,12 +25,6 @@
+ 	exit 1
+ fi
+ 
+-# Check if zenity is present
+-if [[ ! `which zenity 2> /dev/null` ]]; then
+-	echo "`eval_gettext 'ERROR: zenity must be installed for salix-update-notifier to work.'`" >&2
+-	exit 1
+-fi
+-
+ # Wait 10 mins before running for the first time
+ sleep 10m
+ 
+@@ -38,12 +32,7 @@
+ while true; do
+ 	if [[ `LANG=C /usr/sbin/slapt-get -s --upgrade | grep "Need to get"` ]]
+ 	then
+-		/usr/libexec/salix-update-notifier-tray-icon \
+-		&& zenity --question \
+-		--title "`eval_gettext 'Install package updates?'`" \
+-		--text="`eval_gettext 'Package updates are available for your system.\n\nSelecting OK will perform the updates using gslapt. Root user privileges will be required in order to do that.\n\nProceed with updating?'`" \
+-		--window-icon=/usr/share/pixmaps/salix-update-notifier.png \
+-		&& $SUCOMMAND gslapt --upgrade
++		/usr/libexec/salix-update-notifier-tray-icon && $SUCOMMAND gslapt --upgrade
+ 	fi
+ 
+ 	# Check if there is a config file that sets a different interval

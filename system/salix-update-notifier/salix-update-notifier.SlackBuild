@@ -24,7 +24,7 @@
 
 PRGNAM=salix-update-notifier
 VERSION=${VERSION:-0.7.0}
-BUILD=${BUILD:-3}
+BUILD=${BUILD:-4}
 TAG=${TAG:-_mntg}
 
 if [ -z "$ARCH" ]; then
@@ -69,8 +69,8 @@ find -L . \
  \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
-# Uncram zenity dialog box
-sed -i 's/zenity --question \\/zenity --question --ellipsize \\/g' src/salix-update-notifier
+# Patch to get rid of zenity
+patch -p0 < $CWD/remove_zenity.patch
 
 CFLAGS="$SLKCFLAGS" \
 make
