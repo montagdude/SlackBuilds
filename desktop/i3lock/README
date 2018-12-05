@@ -1,0 +1,4 @@
+i3lock is a simple screen locker like slock.
+
+This version displays a clock on the lock screen and uses PAM, which can be
+built from Willy S.R.'s Cinnamon SlackBuilds repository.

@@ -1,0 +1,10 @@
+PRGNAM="i3lock"
+VERSION="gita27257f"
+HOMEPAGE="https://github.com/Lixxia/i3lock"
+DOWNLOAD="git clone"
+MD5SUM="842c914cbbdf39168a56431c0aa29fad"
+DOWNLOAD_x86_64=""
+MD5SUM_x86_64=""
+REQUIRES="libev libxkbcommon pam"
+MAINTAINER="Daniel Prosser
+EMAIL="dpross1100@msn.com"
