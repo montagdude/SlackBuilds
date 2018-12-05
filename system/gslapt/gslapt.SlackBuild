@@ -24,7 +24,7 @@
 
 PRGNAM=gslapt
 VERSION=${VERSION:-0.5.4c}
-BUILD=${BUILD:-2}
+BUILD=${BUILD:-3}
 TAG=${TAG:-_mntg}
 
 if [ -z "$ARCH" ]; then
@@ -69,8 +69,7 @@ find -L . \
  \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
-# Use system icon in .desktop file, remove NotShowIn, and use kdesu
-sed -i "s/\/usr\/share\/pixmaps\/gslapt\.png/package-manager-icon/g" gslapt.desktop.in
+# Remove NotShowIn and use kdesu
 sed -i '/NotShowIn/d' gslapt.desktop.in
 sed -i "s/\/usr\/sbin\/gslapt/kdesu \/usr\/sbin\/gslapt/g" gslapt.desktop.in
 
