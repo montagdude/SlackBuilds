@@ -1,0 +1,14 @@
+LORAAX: LOw Reynolds number Aircraft Aerodynamics with Xfoil
+
+LORAAX is a 3D panel code fully coupled with a 2D integral boundary layer method
+(Xfoil). Unlike traditional panel methods, It can predict nonlinearities in the
+lift and pitching moment curves due to the onset of stall, separation bubbles,
+and laminar-turbulent transition. Xfoil boundary layer calculations are
+performed on the fly via the libxfoil library. Subsonic compressibility effects
+are accounted for through the Prandtl-Glauert transformation. LORAAX is not
+limited to a planar wake; the wake can be optionally deformed to the correct
+force-free shape as part of the iterative solution. Since the boundary layer
+method assumes 2D flow, only 0-sideslip conditions are currently supported, and
+accuracy will suffer for very low aspect ratios and/or highly swept wings. The
+method is applicable for model-scale Reynolds numbers all the way through
+full-scale aircraft in subsonic (not transonic) flight.
