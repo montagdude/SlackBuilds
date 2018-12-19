@@ -1,0 +1,6 @@
+Republic Anywhere is an integrated technology platform that syncs your phone
+number to all your devices.
+
+Note: during startup, it looks for /var/lib/dbus/machine-id' (note trailing
+single quote). I'm not sure if that is an error, but after copying
+/var/lib/dbus/machine-id to /var/lib/dbus/machine-id', it worked.
