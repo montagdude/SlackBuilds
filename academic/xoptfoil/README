@@ -1,0 +1,6 @@
+Xoptfoil is an airfoil optimization code using the Xfoil aerodynamics engine. It
+supports up to 30 operating points and many constraints. Optimization objectives
+include minimizing drag, maximizing glide slope, minimizing sink rate,
+maximizing lift, and maximizing the turbulent transition location. Particle
+swarm or genetic algorithms are the main optimization methods. Xoptfoil also
+includes a tool to monitor the optimization and plot the results.

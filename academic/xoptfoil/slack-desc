@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+        |-----handy-ruler------------------------------------------------------|
+xoptfoil: xoptfoil (airfoil optimization tool)
+xoptfoil:
+xoptfoil: Xoptfoil is an airfoil optimization code using the Xfoil aerodynamics
+xoptfoil: engine. It supports up to 30 operating points and many constraints.
+xoptfoil: Optimization objectives include minimizing drag, maximizing glide
+xoptfoil: slope, minimizing sink rate, maximizing lift, and maximizing
+xoptfoil: turbulent transition location.
+xoptfoil:
+xoptfoil: homepage: https://sourceforge.net/projects/xoptfoil
+xoptfoil:
+xoptfoil:
