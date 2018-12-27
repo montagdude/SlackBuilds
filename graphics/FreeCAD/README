@@ -1,0 +1,8 @@
+FreeCAD is a general purpose 3D CAD modeler, aimed at mechanical
+engineering and product design, but also fits in a wider range of uses
+around engineering, such as architecture or other engineering specialties.
+
+This version is a repackage of the official AppImage from the developers, rather
+than a build from source. A .desktop file and icon are included and installed
+system-wide, so upon first run it is recommended to tell it not to install them
+for the user.
