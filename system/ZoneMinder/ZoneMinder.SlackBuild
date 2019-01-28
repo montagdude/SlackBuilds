@@ -2,8 +2,8 @@
 
 # Slackware build script for ZoneMinder
 
-# Copyright 2014 Gene Baxter <GenoBob@gmail.com>
-# Copyright 2017 Daniel Prosser <dpross1100@msn.com>
+# Copyright 2018 Gene Baxter <GenoBob@gmail.com>
+# Copyright 2019 Daniel Prosser <dpross1100@msn.com>
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -24,9 +24,9 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PRGNAM=ZoneMinder
-VERSION=${VERSION:-1.30.4}
+VERSION=${VERSION:-1.32.3}
 BUILD=${BUILD:-1}
-TAG=${TAG:-_mntg}
+TAG=${TAG:-_SBo}
 
 CAMBOZOLA_VERSION=${CAMBOZOLA_VERSION:-0.936}  # Java streaming client
 JSCALENDAR_VERSION=${JSCALENDAR_VERSION:-1.0} # Calendar plugin (use 1.0 here)
@@ -34,6 +34,8 @@ DOCOWN=${DOCOWN:-apache}
 DOCGRP=${DOCGRP:-apache}
 DOCROOT=${DOCROOT:-"/srv/httpd/htdocs/zm"}
 CGIROOT=${CGIROOT:-"/srv/httpd/cgi-bin"}
+CACHEDIR=${CACHEDIR:-"/var/cache/ZoneMinder"}
+CONTENTDIR=${CONTENTDIR:-"/var/www/zoneminder"}
 
 if [ -z "$ARCH" ]; then
   case "$( uname -m )" in
@@ -44,7 +46,7 @@ if [ -z "$ARCH" ]; then
 fi
 
 CWD=$(pwd)
-TMP=${TMP:-/tmp/mntg}
+TMP=${TMP:-/tmp/SBo}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
@@ -68,10 +70,17 @@ rm -rf $PKG
 mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
 rm -rf $PRGNAM-$VERSION
-tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+mkdir $PRGNAM-$VERSION
+git clone https://github.com/ZoneMinder/zoneminder.git $PRGNAM-$VERSION
 cd $PRGNAM-$VERSION
-tar xvf $CWD/cambozola-$CAMBOZOLA_VERSION.tar.gz
-unzip $CWD/jscalendar-$JSCALENDAR_VERSION.zip
+git checkout $VERSION
+wget http://www.andywilcock.com/code/cambozola/cambozola-$CAMBOZOLA_VERSION.tar.gz
+wget https://downloads.sourceforge.net/jscalendar/jscalendar-$JSCALENDAR_VERSION.zip
+git submodule update --init --recursive
+patch -p0 < $CWD/fix_video_file_format.patch
+patch -p0 < $CWD/fix_zone_area_calc.patch
+tar xvf cambozola-$CAMBOZOLA_VERSION.tar.gz
+unzip jscalendar-$JSCALENDAR_VERSION.zip
 chown -R root:root .
 find -L . \
  \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 \
@@ -84,33 +93,51 @@ CXXFLAGS="$SLKCFLAGS -D__STDC_CONSTANT_MACROS" \
 cd $TMP/$PRGNAM-$VERSION
 cmake -DCMAKE_INSTALL_PREFIX=/usr \
 	-DCMAKE_LIBRARY_PATH=/usr/lib${LIBDIRSUFFIX} \
+	-DCMAKE_CACHEDIR=$CACHEDIR \
+	-DZM_CACHEDIR=$CACHEDIR \
 	-DZM_WEBDIR=$DOCROOT \
 	-DZM_CGIDIR=$CGIROOT \
 	-DZM_WEB_USER=$DOCOWN \
-	-DZM_WEB_GROUP=$DOCGRP .
+	-DZM_WEB_GROUP=$DOCGRP \
+	-DZM_CONTENTDIR=$CONTENTDIR .
 
 make
 make install DESTDIR=$PKG INSTALLDIRS=vendor INSTALLVENDORMAN3DIR=/usr/man/man3
 
+# Strip binaries
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
 
-find $PKG/usr/man -type f -exec gzip -9 {} \;
-mv $PKG/usr/share/man/man8 $PKG/usr/man/
+# Compress manpages
+mkdir -p $PKG/usr/man/man3
+mv $PKG/usr/share/man/man3/* $PKG/usr/man/man3/
+mkdir -p $PKG/usr/man/man8
+mv $PKG/usr/share/man/man8/* $PKG/usr/man/man8/
 rm -rf $PKG/usr/share/man
+find $PKG/usr/man -type f -exec gzip -9 {} \;
 
+# Remove junk files and dirs
 find $PKG -name perllocal.pod \
   -o -name ".packlist" \
   -o -name "*.bs" \
+  -o -name ".editorconfig" \
+  -o -name ".packlist" \
+  -o -name ".git" \
+  -o -name "empty" \
   | xargs rm -f || true
 
 find $PKG/usr -depth -type d -empty -delete || true
 
 mkdir -p $PKG/var/{log,lock/subsys}
+mkdir -p $PKG/var/{log,lock/subsys}
 install -d -o $DOCOWN -g $DOCGRP $PKG/var/log/zm
+install -d -o $DOCOWN -g $DOCGRP $PKG/var/tmp/zm
+install -d -o $DOCOWN -g $DOCGRP $PKG/var/run/zm
+mkdir -p $PKG$CACHEDIR
+install -d -o $DOCOWN -g $DOCGRP $PKG$CACHEDIR
 
 for DIR in events images sound; do
-  install -d -o $DOCOWN -g $DOCGRP $PKG$DOCROOT/$DIR
+  install -d -o $DOCOWN -g $DOCGRP $PKG/var/lib/ZoneMinder/$DIR
 done
 
 # Install logrotate script
@@ -137,15 +164,12 @@ cp -Rp jscalendar-$JSCALENDAR_VERSION/* $PKG$DOCROOT/tools/jscalendar
 mkdir -p $PKG/usr/share/$PRGNAM/db
 cp -a db/zm_create.sql db/zm_update-*.sql $PKG/usr/share/$PRGNAM/db
 
-# Install systemd .service file
-mkdir -p $PKG/usr/lib/systemd/user
-cp -a $CWD/zoneminder.service $PKG/usr/lib/systemd/user
-
 # Fix permissions
 mkdir -p $PKG/tmp
 chmod 777 $PKG/tmp
 chmod +t $PKG/tmp
 
+# Copy documentation
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
 cp -a AUTHORS ChangeLog INSTALL NEWS TODO $PKG/usr/doc/$PRGNAM-$VERSION
 cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
