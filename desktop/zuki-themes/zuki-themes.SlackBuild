@@ -3,7 +3,7 @@
 # Slackware build script for zuki-themes.
 #
 # Copyright 2016-2018  Edinaldo P. Silva, Rio de Janeiro, Brazil.
-# Copyright 2018 Daniel Prosser, Lexington Park, MD, USA.
+# Copyright 2018-2019 Daniel Prosser, Lexington Park, MD, USA.
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -24,18 +24,17 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PRGNAM="zuki-themes"
-VERSION=${VERSION:-3.18.1}
+VERSION=${VERSION:-3.34.1}
+SRCVER=${SRCVER:-3.34-1}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_mntg}
 
 ARCH=noarch
 
+CWD=$(pwd)
 TMP=${TMP:-/tmp/mntg}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
-CWD=$(pwd)
-
-SRCVER=${SRCVER:-3.18-1}
 
 set -e
 
@@ -47,14 +46,33 @@ tar xvf $CWD/$PRGNAM-$SRCVER.tar.gz
 mv $PRGNAM-$SRCVER $PRGNAM-$VERSION
 cd $PRGNAM-$VERSION
 chown -R root:root .
+find -L . \
+ \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 \
+  -o -perm 511 \) -exec chmod 755 {} \; -o \
+ \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
+  -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
-THEMES="Zuki-shell Zukitre Zukitwo"
+mkdir build
+cd build
+  CFLAGS="$SLKCFLAGS" \
+  CXXFLAGS="$SLKCFLAGS" \
+  meson .. \
+    --buildtype=release \
+    --infodir=/usr/info \
+    --libdir=/usr/lib${LIBDIRSUFFIX} \
+    --localstatedir=/var \
+    --mandir=/usr/man \
+    --prefix=/usr \
+    --sysconfdir=/etc
+  ninja
+  DESTDIR=$PKG ninja install
+cd ..
 
-mkdir -p $PKG/usr/share/themes
-cp -r $THEMES $PKG/usr/share/themes/
+find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
+  | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
-cp LICENSE README.md $PKG/usr/doc/$PRGNAM-$VERSION
+cp CONTRIBUTING.md LICENSE README.md $PKG/usr/doc/$PRGNAM-$VERSION
 cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
 
 mkdir -p $PKG/install
