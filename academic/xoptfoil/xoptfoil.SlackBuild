@@ -23,8 +23,9 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PRGNAM=xoptfoil
-VERSION=${VERSION:-1.11.0}
-SRCVER=${SRCVER:-Xoptfoil-v1.11.0-linux_source}
+SRCNAM=Xoptfoil
+VERSION=${VERSION:-git47184c9f9}
+COMMITVER=47184c9f9802fc88b4cad8756a3e2febfcb0a2c6
 BUILD=${BUILD:-1}
 TAG=${TAG:-_mntg}
 
@@ -60,15 +61,18 @@ set -e
 rm -rf $PKG
 mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
-rm -rf $SRCVER
-tar xvf $CWD/$SRCVER.tar.gz
-cd $SRCVER
+rm -rf $SRCNAM-$COMMITVER
+tar xvf $CWD/$SRCNAM-$COMMITVER.tar.gz
+cd $SRCNAM-$COMMITVER
 chown -R root:root .
 find -L . \
  \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 \
   -o -perm 511 \) -exec chmod 755 {} \; -o \
  \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
+
+# Needed for development releases since PDFs are not compiled
+patch -p0 < $CWD/noinstall_pdf.diff
 
 mkdir -p build
 cd build

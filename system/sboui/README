@@ -12,7 +12,7 @@ INSTALL_SYSTRAY_NOTIFIER=yes|no (default no): install a cronjob to sync the
   local repository hourly and display a system tray notification when SBo
   package updates are available. To use the system tray notifier, add
   sboui-update-notifier as a startup application for your desktop environment or
-  window manager.
+  window manager. If enabled, psutils becomes a dependency.
 
 GRAPHICAL_SU=kdesu|gksu|ktsuss (default kdesu): change the graphical su command
   for launching sboui from the .desktop file and system tray notifier. gksu or
