@@ -8,12 +8,12 @@
      |-----handy-ruler------------------------------------------------------|
 sboui: sboui (ncurses SBo package management tool)
 sboui:
-sboui: sboui is a package management tool for SlackBuilds.org (SBo). It features
-sboui: an ncurses user interface that combines the user-friendliness typically
-sboui: found in a GUI with the efficiency, light weight, and portability of a
-sboui: text interface. It can function as a stand-alone package manager or serve
-sboui: as a front-end to sbopkg, sbotools, or custom package managers.
+sboui: sboui is a package management tool for SlackBuilds.org (SBo). It
+sboui: features an ncurses user interface that combines the user-friendliness
+sboui: typically found in a GUI with the efficiency, light weight, and
+sboui: portability of a text interface. It can function as a stand-alone
+sboui: package manager or serve as a front-end to sbopkg, sbotools, or
+sboui: custom package managers.
 sboui:
 sboui: homepage: https://github.com/montagdude/sboui
-sboui:
 sboui:
