@@ -1,0 +1,169 @@
+--- scripts/installpkg	2019-10-04 02:05:27.410390341 -0400
++++ scripts/installpkg.new	2019-11-28 13:02:12.458356413 -0500
+@@ -2,6 +2,7 @@
+ # Copyright 1994, 1998, 2000  Patrick Volkerding, Concord, CA, USA 
+ # Copyright 2001, 2003  Slackware Linux, Inc., Concord, CA, USA
+ # Copyright 2007, 2009, 2011, 2017, 2018, 2019  Patrick Volkerding, Sebeka, MN, USA 
++# Copyright 2019 Daniel Prosser, Lexington Park, MD, USA
+ # All rights reserved.
+ #
+ # Redistribution and use of this script, with or without modification, is
+@@ -21,6 +22,11 @@
+ #  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #
++# Thu Nov 28 12:54 EST 2019 Daniel Prosser
++# Keep a backup of original config files and do not create a new one unless
++# it differs from the original. This way, user changes will not trigger a new
++# config file to be written.
++#
+ # Fri Oct  4 06:04:39 UTC 2019
+ # Add support for --no-overwrite so that upgradepkg can be kind to SSDs.
+ #
+@@ -104,6 +110,67 @@
+   echo "$1" | sed 's?.*/??;s/\.t[bglx]z$//'
+ }
+ 
++# Replace existing config() file in doinst.sh with one that compares with an
++# unmodified reference file when deciding whether to write a .new
++replace_config() {
++  local INCOMING="$1"
++  local TEMP=tmpconf
++
++  # Write a temporary install file with replaced config() function
++  rm -f $TEMP
++  local MODE="copy"
++
++  # https://stackoverflow.com/questions/4642191/read-line-by-line-in-bash-script
++  while IFS= read -r line; do
++    if [ "$MODE" == "copy" ]; then
++      if [ -n "$(echo "$line" | grep "config()")" ]; then
++        MODE="replace"
++
++        # Backslash prevents variable expansion in heredoc
++        cat << \EOF >> $TEMP
++config() {
++  NEW="$1"
++  OLD="$(dirname $NEW)/$(basename $NEW .new)"
++  REF="${OLD}.ref"
++  # If there's no config file by that name, mv it over:
++  if [ ! -r $OLD ]; then
++    cp $NEW $REF
++    mv $NEW $OLD
++  else
++    # If reference config file doesn't exist, fall back to the old behavior
++    if [ ! -r $REF ]; then
++      if [ "$(cat $OLD | md5sum)" = "$(cat $NEW | md5sum)" ]; then # toss the redundant copy
++        mv $NEW $REF
++      else
++        cp $NEW $REF
++      fi
++    else
++      if [ "$(cat $REF | md5sum)" = "$(cat $NEW | md5sum)" ]; then # toss the redundant copy
++        mv $NEW $REF
++      else
++        cp $NEW $REF
++      fi
++    fi
++  fi
++}
++EOF
++      else
++        printf '%s\n' "$line" >> $TEMP
++      fi
++    elif [ "$MODE" == "replace" ]; then
++
++      # https://stackoverflow.com/questions/369758/how-to-trim-whitespace-from-a-bash-variable
++      remove_leading_whitespace="$(echo -e "${line}" | sed -e 's/^[[:space:]]*//')"
++      if [ "${remove_leading_whitespace:0:1}" == "}" ]; then
++        MODE="copy"
++      fi
++    fi
++  done < "$INCOMING"
++
++  # Overwrite original file
++  mv $TEMP $INCOMING
++}
++
+ # If installpkg encounters a problem, it will return a non-zero error code.
+ # If it finds more than one problem (i.e. with a list of packages) you'll only
+ # hear about the most recent one. :)
+@@ -208,6 +275,7 @@
+ 
+ # Default install mode is standard text mode:
+ MODE=install
++PREINSTALL=0
+ # If $TERSE is set to 0 in the environment, then use terse mode:
+ if [ "$TERSE" = "0" ]; then
+   MODE=terse
+@@ -269,6 +337,9 @@
+     fi
+     ROOT="$2"
+     shift 2
++  elif [ "$1" = "-preinstall" -o "$1" = "--preinstall" ]; then
++    PREINSTALL=1
++    shift 1
+   else
+     break
+   fi
+@@ -662,12 +733,14 @@
+     ) 9> $INSTLOCKDIR/ldconfig.lock
+   fi
+ 
+-  if [ -f $ROOT/$INSTDIR/doinst.sh ]; then
++  if [ -f $ROOT/$INSTDIR/doinst.sh -a $PREINSTALL -eq 0 ]; then
+     if [ "$MODE" = "install" ]; then
+       echo "Executing install script for $(basename $package)."
+     fi
+     # Don't use locking if the script contains "NOLOCK":
+     if grep -q NOLOCK $ROOT/$INSTDIR/doinst.sh ; then
++      # Replace config() function in install script to consider .ref files
++      replace_config $ROOT/install/doinst.sh
+       # If bash is available, use sed to convert the install script to use pushd/popd
+       # rather than spawning subshells which is slow on ARM.  This will also speed up
+       # install script processing on any platform.
+--- scripts/upgradepkg	2019-10-13 13:37:56.378827182 -0400
++++ scripts/upgradepkg.new	2019-11-28 13:05:28.305252499 -0500
+@@ -3,6 +3,7 @@
+ # Copyright 2001, 2002, 2003  Slackware Linux, Inc., Concord, California, USA
+ # Copyright 2009, 2015  Patrick J. Volkerding, Sebeka, MN, USA
+ # Copyright 2015  Michal Nazarewicz <mina86@mina86.com>
++# Copyright 2019 Daniel Prosser Lexington Park, MD, USA
+ # All rights reserved.
+ #
+ # Redistribution and use of this script, with or without modification, is
+@@ -22,6 +23,10 @@
+ #  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #
++# Thu Nov 28 13:03 EST 2019
++# Do not run doinst.sh during the preinstall phase. This is needed to facilitate
++# the changes made in installpkg.
++#
+ # Mon Jun  4 21:17:58 UTC 2018
+ # Use /var/lib/pkgtools, not /var/log.
+ #
+@@ -356,19 +361,19 @@
+   # Next, the new package is pre-installed:
+   if [ "$VERBOSE" = "verbose" ]; then
+     if ! [ $TERSE ]; then
+-      /sbin/installpkg $INCOMINGDIR/$NNAME
++      /sbin/installpkg --preinstall $INCOMINGDIR/$NNAME
+       RETCODE=$?
+     else
+-      /sbin/installpkg $INCOMINGDIR/$NNAME 1> /dev/null
++      /sbin/installpkg --preinstall $INCOMINGDIR/$NNAME 1> /dev/null
+       RETCODE=$?
+     fi
+   else
+     if [ $PLAINTERSE ]; then
+-      /sbin/installpkg --terse --terselength $TERSELENGTH $INCOMINGDIR/$NNAME
++      /sbin/installpkg --terse --terselength $TERSELENGTH --preinstall $INCOMINGDIR/$NNAME
+     elif [ $INFOBOX ]; then
+       /sbin/installpkg --infobox $INCOMINGDIR/$NNAME
+     elif [ $TERSE ]; then
+-      OUTPUTLINE="$(/sbin/installpkg --terse --terselength $(expr $TERSELENGTH - 12) $INCOMINGDIR/$NNAME)"
++      OUTPUTLINE="$(/sbin/installpkg --terse --terselength $(expr $TERSELENGTH - 12) --preinstall $INCOMINGDIR/$NNAME)"
+       RETCODE=$?
+       ( flock 9 || exit 11
+         echo "Upgrading:  ${OUTPUTLINE}"

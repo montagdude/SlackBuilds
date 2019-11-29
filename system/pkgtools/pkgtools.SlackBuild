@@ -1,5 +1,6 @@
-#!/bin/sh
-# Copyright 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013  Patrick J. Volkerding, Sebeka, MN, USA
+#!/bin/bash
+# Copyright 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2018  Patrick J. Volkerding, Sebeka, MN, USA
+# Copyright 2019 Daniel Prosser
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -20,16 +21,26 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # Set initial variables:
-CWD=`pwd`
+cd $(dirname $0) ; CWD=$(pwd)
 if [ "$TMP" = "" ]; then
   TMP=/tmp
 fi
 PKG=$TMP/package-pkgtools
+TAG=${TAG:-_mntg}
 
+PKGNAM=pkgtools
 # *** UPDATE THESE WITH EACH BUILD:
-VERSION=14.2
+VERSION=15.0
 ARCH=${ARCH:-noarch}
-BUILD=13
+BUILD=${BUILD:-28}
+
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ ! -z "${PRINT_PACKAGE_NAME}" ]; then
+  echo "$PKGNAM-$VERSION-$ARCH-$BUILD.txz"
+  exit 0
+fi
 
 if [ ! -d $TMP ]; then
   mkdir -p $TMP # location to build the source
@@ -37,11 +48,16 @@ fi
 rm -rf $PKG
 mkdir -p $PKG
 
+# Patch installpkg and upgradepkg to only create new config files when different
+# from the reference. This way, if the only changes are ones the user has made,
+# a new config will not be created.
+patch -p0 < $CWD/backup_config.patch
+
 # Install Slackware script manpages:
 ( cd $CWD/manpages
   mkdir -p $PKG/usr/man/man8
-  for page in explodepkg.8 installpkg.8 makepkg.8 upgradepkg.8 pkgtool.8 \
-    removepkg.8 ; do
+  for page in explodepkg.8 installpkg.8 makepkg.8 upgradepkg.8 pkgdiff.8 \
+    pkgtool.8 removepkg.8 ; do
     cat $page | gzip -9c > $PKG/usr/man/man8/$page.gz
   done
 )
@@ -65,31 +81,38 @@ mkdir -p $PKG
   mkdir -p $PKG/sbin
   # Don't include makebootdisk...  it's useless since a kernel won't fit on a
   # floppy disk, and nobody uses floppies any more anyway.
-  for file in explodepkg installpkg makepkg pkgtool removepkg upgradepkg ; do
+  for file in explodepkg installpkg makepkg pkgdiff pkgtool removepkg upgradepkg ; do
     cp -a $CWD/scripts/$file $PKG/sbin
   done
   chown root:root $PKG/sbin/*
   chmod 755 $PKG/sbin/*
   # These scripts are used during the installation:
-  mkdir -p $PKG/var/log/setup/tmp
-  chmod 700 $PKG/var/log/setup/tmp
+  mkdir -p $PKG/var/lib/pkgtools/setup/tmp
+  chmod 700 $PKG/var/lib/pkgtools/setup/tmp
   for file in setup.* ; do
-    cp -a $file $PKG/var/log/setup
+    cp -a $file $PKG/var/lib/pkgtools/setup
   done
-  chown root:root $PKG/var/log/setup/setup.*
-  chmod 755 $PKG/var/log/setup/setup.*
+  chown root:root $PKG/var/lib/pkgtools/setup/setup.*
+  chmod 755 $PKG/var/lib/pkgtools/setup/setup.*
   # Add a link for makebootstick:
-  ( cd $PKG/sbin ; ln -sf ../var/log/setup/setup.80.make-bootdisk makebootstick )
+  ( cd $PKG/sbin ; ln -sf ../var/lib/pkgtools/setup/setup.80.make-bootdisk makebootstick )
 )
+
+# Create the base directories (not really necessary, but doesn't hurt):
+mkdir -p $PKG/var/lib/pkgtools/{packages,scripts}
+mkdir -p $PKG/var/log/pkgtools/{removed_packages,removed_scripts}
 
 mkdir -p $PKG/install
 cat $CWD/slack-desc > $PKG/install/slack-desc
+zcat $CWD/doinst.sh.gz > $PKG/install/doinst.sh
 
 # Build the package:
 cd $PKG
-makepkg -l y -c n $TMP/pkgtools-$VERSION-$ARCH-$BUILD.txz
+makepkg -l y -c n $TMP/pkgtools-$VERSION-$ARCH-$BUILD$TAG.txz
 
 echo
 echo "HEY -- did you remember to update the version numbers in the setup scripts?"
 echo
 
+# Undo the patch in the source directory for clean build next time
+patch -p0 -R < $CWD/backup_config.patch

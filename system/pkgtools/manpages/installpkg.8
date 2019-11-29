@@ -31,6 +31,9 @@ installpkg \- install Slackware packages.
 .B \--terse
 ]
 [
+.B \--terselength <length>
+]
+[
 .B \--ask
 ]
 [
@@ -39,13 +42,19 @@ installpkg \- install Slackware packages.
 [
 .B \--tagfile /somedir/tagfile
 ]
+[
+.B \--threads <number>
+]
+[
+.B \--no-overwrite
+]
 .BI packagename
 [
 .B packagename2 ...
 ]
 .SH DESCRIPTION
 .B installpkg
-installs single or multiple *.tgz (or .tbz, .tlz, .txz) binary packages designed
+installs single or multiple *.txz (or .tbz, .tgz, .tlz) binary packages designed
 for use with the Slackware Linux distribution onto your system.
 .SH OPTIONS
 .TP
@@ -55,7 +64,7 @@ not actually install the package.  The list is formatted in a suitable fashion t
 use as a list of files to backup.
 .TP
 .B \--md5sum packagename
-Record the package md5sum in the metadata written in /var/log/packages.
+Record the package md5sum in the metadata written in /var/lib/pkgtools/packages.
 .TP
 .B \--root /otherroot
 Install using a location other than / (the default) as the root of the
@@ -73,6 +82,9 @@ package(s) or not.  Generally used when installpkg is called from other scripts.
 .B \--terse
 Install the package displaying only a single description line to stdout.
 .TP
+.B \--terselength <length>
+Maximum line length of --terse mode output. Default is the number of terminal columns.
+.TP
 .B \--ask
 Used with -menu mode.  When selected, always ask if a package should be
 installed regardless of what the package's priority is.
@@ -87,6 +99,18 @@ the values set in the tagfile for the entire package list.
 .B \--tagfile /somedir/tagfile
 Specify a different file to use for package priorities (in this example, /somedir/tagfile
 will be used).  The default is "tagfile" in the package's directory.
+.TP
+.B \--threads <number>
+For xz/plzip compressed packages, set the maximum number of threads to be used for
+decompression. Only has an effect if a multithreaded compressor was used, and then
+only on large packages. The default for plzip is the number of CPU threads available.
+The default for xz is 2.
+.TP
+.B \--no-overwrite
+When extracting the package, do not overwrite existing files. Usually, this option
+should not be used. It exists so that upgradepkg can use it for the second installation
+pass. The first pass has already overwritten the previous package's files, and this will
+catch the few corner cases without generating unnecessary writes.
 .SH EXAMPLES
 .TP
 .B Install a font package for X:

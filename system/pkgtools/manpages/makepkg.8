@@ -18,6 +18,18 @@ makepkg \- make Slackware packages.
 [
 .B -c, --chown y|n
 ]
+[
+.B --threads <number>
+]
+[
+.B --compress <option>
+]
+[
+.B --acls
+]
+[
+.B --xattrs
+]
 .BI packagename
 .SH DESCRIPTION
 .B makepkg
@@ -30,9 +42,9 @@ appended to the primary installation script
 , or, if that script does not exist it will be created with those contents.
 The package will be written out to the file
 .BI packagename
-which should be the full name, including the extension.  This is usually .tgz,
-but .tbz, .tlz, and .txz are also accepted.  The proper compression utility
-(gzip, bzip2, lzma, or xz) needs to be installed on the machine.
+which should be the full name, including the extension.  This is usually .txz,
+but .tgz, .tbz, and .tlz are also accepted.  The proper compression utility
+(xz, gzip, bzip2, or lzip) needs to be installed on the machine.
 .SH OPTIONS
 .TP
 .B \-l, --linkadd y|n
@@ -51,6 +63,30 @@ If y, makepkg will reset all directory permissions to 755 and ownership to root:
 In general, you should have the permissions and ownerships worked out yourself, so
 relying on setting this option to y is somewhat sloppy.  It is not the default.  If an
 option is not provided, makepkg will prompt.
+.TP
+.B --threads <number>
+For xz/plzip compressed packages, set the maximum number of threads to be used for
+compression. Only has an effect on large packages. For plzip, the default is the number
+of CPU threads available. For xz, the default is 2 (due to commonly occuring memory
+related failures on 32-bit with too many threads and multithreaded xz compression).
+.TP
+.B --compress <option>
+Supply a custom option to the compressor. This will be used in place of the default, which is: -9
+.TP
+.B --acls
+Support storing POSIX ACLs in the package. The resulting package will not be compatible
+with pkgtools version < 15.0.
+.TP
+.B --xattrs
+Support storing extended attributes in the package. The resulting package will not be
+compatible with pkgtools version < 15.0.
+.SH ENVIRONMENT
+.TP
+.B SOURCE_DATE_EPOCH
+A UNIX date-time (seconds since 1 Jan 1970). If set, any newer timestamps in the package
+will be rewritten ("clamped") to this date-time. See
+.I https://reproducible-builds.org/specs/source-date-epoch/
+for more details.
 .SH INSTALLATION SCRIPTS
 There are 3 types of installation scripts supported in the Slackware package
 system. 
@@ -81,11 +117,11 @@ or
 The second type of script is the
 .B configuration
 script. This is found in the subdirectory
-.B ./var/log/setup
+.B ./var/lib/pkgtools/setup
 and must have a name that starts with
 .B setup.
 in order to be recongnized. An example is the timezone script: 
-.B /var/log/setup/setup.timeconfig. 
+.B /var/lib/pkgtools/setup/setup.timeconfig. 
 These scripts are executed during the
 .B CONFIGURE
 phase of
@@ -107,13 +143,13 @@ script. Like the name suggests, these are executed only once after the package
 is installed, in contrast to the standard
 .B configuration
 script. These scripts are also found in the
-.B ./var/log/setup
+.B ./var/lib/pkgtools/setup
 directory and must have a name that starts with
 .B setup., 
 but in addition the name must contain the string
 .B onlyonce.
 An example might be a script with the name 
-.B /var/log/setup/setup.onlyonce.testscript
+.B /var/lib/pkgtools/setup/setup.onlyonce.testscript
 .SH PACKAGE FORMAT
 .B makepkg
 uses GNU tar plus GNU gzip to create its packages. A simple way to 
