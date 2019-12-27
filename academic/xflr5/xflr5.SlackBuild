@@ -23,7 +23,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PRGNAM=xflr5
-VERSION=${VERSION:-6.46}
+VERSION=${VERSION:-6.47}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_mntg}
 
@@ -60,7 +60,7 @@ rm -rf $PKG
 mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
 rm -rf $PRGNAM
-tar xvf $CWD/${PRGNAM}_${VERSION}_src.tar.gz
+tar xvf $CWD/${PRGNAM}_v${VERSION}_src.tar.gz
 cd $PRGNAM
 chown -R root:root .
 find -L . \
@@ -70,10 +70,13 @@ find -L . \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
 # Change default path for libraries installation
-sed -i "s/target\.path = \/usr\/local\/lib/target\.path = \/usr\/lib${LIBDIRSUFFIX}/g" \
+sed -i "s/target\.path = \$\$PREFIX\/lib/target\.path = \$\$PREFIX\/lib${LIBDIRSUFFIX}/g" \
   XFoil-lib/XFoil-lib.pro
-sed -i "s/target\.path = \/usr\/local\/lib/target\.path = \/usr\/lib${LIBDIRSUFFIX}/g" \
+sed -i "s/target\.path = \$\$PREFIX\/lib/target\.path = \$\$PREFIX\/lib${LIBDIRSUFFIX}/g" \
   xflr5-engine/xflr5-engine.pro
+
+# Fix linking
+patch -p0 < $CWD/link_directly.patch
 
 qmake-qt5 \
   PREFIX=/usr \
