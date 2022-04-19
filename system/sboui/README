@@ -11,7 +11,6 @@ Optional dependencies (see build options for more information):
 python-requests (for system tray notifier)
 psutil (for system tray notifier)
 gksu, ktsuss (instead of kdesu to launch from the desktop)
-ninja (to build with ninja instead of make)
 
 Build options:
 
@@ -29,5 +28,4 @@ GRAPHICAL_SU=kdesu|gksu|ktsuss (default kdesu): change the graphical su command
 TERMINAL_EMULATOR=(user choice; default xterm) set the terminal emulator to run
   sboui via the .desktop file and system tray notifier.
 
-USE_NINJA=yes|no (default no): use ninja instead of GNU Make for the build. If
-  enabled, ninja becomes a dependency.
+USE_NINJA=yes|no (default yes): use ninja instead of GNU Make for the build.

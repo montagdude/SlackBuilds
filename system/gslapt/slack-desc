@@ -1,19 +1,19 @@
 # HOW TO EDIT THIS FILE:
-# The "handy ruler" below makes it easier to edit a package description.
-# Line up the first '|' above the ':' following the base package name, and
-# the '|' on the right side marks the last column you can put a character in.
-# You must make exactly 11 lines for the formatting to be correct.  It's also
-# customary to leave one space after the ':' except on otherwise blank lines.
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
 
       |-----handy-ruler------------------------------------------------------|
-gslapt: gslapt (GTK version of slapt-get)
-gslapt:
-gslapt: gslapt is a GTK version of slapt-get. It requires slapt-get.
-gslapt:
-gslapt: homepage: https://software.jaos.org/
-gslapt:
-gslapt:
-gslapt:
-gslapt:
-gslapt:
-gslapt:
+gslapt: gslapt (GTK slapt-get, an APT like system for Slackware)
+gslapt: gslapt is an APT like system for Slackware package management.
+gslapt: 
+gslapt: 
+gslapt:  * See /usr/doc/gslapt/ for complete documentation. 
+gslapt:  * Support:
+gslapt:    https://github.com/jaos/slapt-get/issues
+gslapt:  * Please translate
+gslapt:    https://www.transifex.com/jaos/slapt-get/
+gslapt: 
+gslapt: 

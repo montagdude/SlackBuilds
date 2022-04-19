@@ -2,7 +2,7 @@
 
 # Slackware build script for gslapt
 
-# Copyright 2018 Daniel Prosser <dpross1100@msn.com>
+# Copyright 2022 Daniel Prosser <dpross1100@msn.com>
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -23,8 +23,8 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PRGNAM=gslapt
-VERSION=${VERSION:-0.5.4c}
-BUILD=${BUILD:-3}
+VERSION=${VERSION:-0.5.9}
+BUILD=${BUILD:-1}
 TAG=${TAG:-_mntg}
 
 if [ -z "$ARCH" ]; then
@@ -69,30 +69,39 @@ find -L . \
  \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
-# Remove NotShowIn and use kdesu
-sed -i '/NotShowIn/d' gslapt.desktop.in
-sed -i "s/\/usr\/sbin\/gslapt/kdesu \/usr\/sbin\/gslapt/g" gslapt.desktop.in
+mkdir build
+cd build
+  CFLAGS="$SLKCFLAGS" \
+  CXXFLAGS="$SLKCFLAGS" \
+  LIBDIR=lib${LIBDIRSUFFIX} \
+  meson .. \
+    --buildtype=release \
+    --infodir=/usr/info \
+    --libdir=/usr/lib${LIBDIRSUFFIX} \
+    --localstatedir=/var \
+    --mandir=/usr/man \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    -Dstrip=true
 
-CFLAGS="$SLKCFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
-./configure \
-  --prefix=/usr \
-  --libdir=/usr/lib${LIBDIRSUFFIX}
-
-make
-make install DESTDIR=$PKG
+    "${NINJA:=ninja}"
+    DESTDIR=$PKG $NINJA install
+cd ..
 
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
 
 mkdir -p $PKG/install
 cat $CWD/slack-desc > $PKG/install/slack-desc
+cat $CWD/doinst.sh > $PKG/install/doinst.sh
 
-# Move docs manually since --docdir option doesn't seem to do anything
-mkdir $PKG/usr/doc
+# Move docs to correct location for slackware (there doesn't seem to be a build flag for it)
+mkdir -p $PKG/usr/doc
 mv $PKG/usr/share/doc/$PRGNAM $PKG/usr/doc/$PRGNAM-$VERSION
-rm -rf $PKG/usr/share/doc
 cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
+
+# Fix .desktop file to show in KDE
+sed -i '/NotShowIn/d' $PKG/usr/share/applications/gslapt.desktop
 
 # Get rid of extraneous .desktop file
 rm $PKG/usr/share/applications/gslapt-kde.desktop
